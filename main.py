@@ -52,6 +52,8 @@ grid_rect.y = block_size * 2
 pygame.mixer.music.load("music.wav")
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1)
+reaction_frames = 0
+is_reaction_frames = False
 
 
 def redraw_grid():
@@ -123,21 +125,28 @@ while is_running:
                     if not tetromino.check_borders():
                         tetromino = old_tetromino
                         break
+    if is_reaction_frames:
+        reaction_frames -= 1
+        if reaction_frames == 0:
+            new_tetromino()
+            is_reaction_frames = False
     screen.fill(BLACK)
     screen.blit(grid, (0, 0))
-    if fast_fall and animation % (FPS // 4) == 0:
+    if fast_fall and animation % (FPS // 4) == 0 and not is_reaction_frames:
         tetromino.update(0, 1)
-    elif animation % (FPS // 2) == 0:
+    elif animation % (FPS // 2) == 0 and not is_reaction_frames:
         tetromino.update(0, 1)
     for i in range(len(field)):
         for j in range(len(field[0])):
             if field[i][j] == 1:
                 screen.fill(WHITE, (j * block_size + 1, i * block_size + 1, block_size - 2, block_size - 2))
-    if any((field[y][x] == 1 for x, y in tetromino.positions)):
+    if not reaction_frames and any((field[y][x] == 1 for x, y in tetromino.positions)):
         tetromino.update(0, -1)
         new_tetromino()
-    elif any((y == len(field) - 1 for x, y in tetromino.positions)):
-        new_tetromino()
+    elif not reaction_frames and any((y == len(field) - 1 for x, y in tetromino.positions)):
+        reaction_frames = 20
+        is_reaction_frames = True
+
     full_lines = list()
     for i in range(len(field)):
         if all(map(lambda x: x == 1, field[i])):
