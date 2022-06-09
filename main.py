@@ -152,7 +152,7 @@ while is_running:
                 field[i][j] = field[i - 1][j]
     if any((field[0][i] == 1 for i in range(len(field[0])))):
         score = 0
-        field = [[0 for i in range(width // block_size)] for j in range(height // block_size)]
+        field = [[0 for i in range(field_width)] for j in range(field_height)]
         n = options.pop()
         tetromino = Tetromino(n, spawns[n])
     if not options:
